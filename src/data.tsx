@@ -1,9 +1,16 @@
-/* 
-https://www.iconfinder.com/icons/1243689/call_phone_icon
-Creative Commons (Attribution 3.0 Unported);
-https://www.iconfinder.com/Makoto_msk */
+interface Product_ {
+  id: number;
+  title: string;
+  img: string;
+  price: number;
+  company: string;
+  info: string;
+  inCart: boolean;
+  count: number;
+  total: number;
+}
 
-export const storeProducts = [
+export const storeProducts: Product_[] = [
   {
     id: 1,
     title: "Google Pixel - Black",

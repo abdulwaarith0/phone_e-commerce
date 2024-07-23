@@ -8,6 +8,8 @@ interface Product {
     img: string;
     price: number;
     inCart: boolean;
+    company: string;
+    info: string;
 }
 
 interface InitialState {
@@ -17,18 +19,18 @@ interface InitialState {
 
 interface contextType extends InitialState {
     setProducts: () => void;
-    handleDetail: () => void;
-    addToCart: () => void;
+    handleDetail: (id: number) => void;
+    addToCart: (id: number) => void;
 }
 
 
 type Action =
     | { type: "SET_PRODUCTS"; payload: Product[] }
-    | { type: "HANDLE_DETAIL" }
-    | { type: "ADD_TO_CART" };
+    | { type: "HANDLE_DETAIL", payload: Product | undefined }
+    | { type: "ADD_TO_CART", payload: number };
 
 
-const initialState = {
+const initialState: InitialState = {
     products: [],
     detailProduct,
 };
@@ -41,7 +43,7 @@ const reducer = (state: InitialState, action: Action) => {
         case "SET_PRODUCTS":
             return { ...state, products: action.payload };
         case "HANDLE_DETAIL":
-            return state;
+            return {...state, detailProduct: action.payload};
         case "ADD_TO_CART":
             return state;
         default:
@@ -63,19 +65,25 @@ const ProductProvider = ({ children }: { children: ReactNode }) => {
             ...item
         }));
         dispatch({
-            type: "SET_PRODUCTS", payload:
-                products
+            type: "SET_PRODUCTS", payload: products
         });
     };
 
-    const handleDetail = () => {
-        console.log("Hello handle details");
-        dispatch({ type: "HANDLE_DETAIL" });
+    const getItem = (id: number) => {
+        const product = state.products.find(item =>
+            item.id === id);
+            return product;
+    }
+
+    const handleDetail = (id: number) => {
+        const product = getItem(id);
+        dispatch({ type: "HANDLE_DETAIL", payload: product });
     };
 
-    const addToCart = () => {
-        console.log("Hello handle cart");
-        dispatch({ type: "ADD_TO_CART" });
+    const addToCart = (id: number) => {
+        let tempProducts = [...state.products];
+        
+        dispatch({ type: "ADD_TO_CART", payload: id });
     };
 
     return (

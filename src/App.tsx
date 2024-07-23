@@ -12,7 +12,15 @@ function App() {
       <Routes>
         <Route path="/" element={<ProductList />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/details" element={<Details />} />
+        <Route path="/details" element={<Details product={{
+          id: 0,
+          title: "",
+          img: "",
+          price: 0,
+          inCart: false,
+          company: "",
+          info: ""
+        }} />} />
         <Route path="*" element={<Default />} />
       </Routes>
 

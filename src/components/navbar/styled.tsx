@@ -11,7 +11,7 @@ export const ButtonContainer = styled.button`
     padding: 0.5rem;
     letter-spacing: 0.1rem;
     cursor: pointer;
-    margin: 0.2rem 1rem 0.2rem 0;
+    margin: 0 0.8rem;
     transition: all 0.5s ease-in-out;
     &:hover {
         background: var(--lightBlue);
@@ -28,7 +28,9 @@ export const Nav = styled.nav`
     color: var(--mainWhite) !important;
     font-size:1.3rem;
     text-transform:capitalize;
+    margin: 0 0 0 1rem;
   }
+
   @media (max-width: 576px) {
     .navbar-nav {
       display: flex !important;

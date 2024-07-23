@@ -3,9 +3,14 @@ import Title from '../title';
 import { ProductContext } from '../../context/Context';
 import Products from '../products';
 
-
 const ProductList: React.FC = () => {
-  const { products } = useContext(ProductContext);
+  const context = useContext(ProductContext);
+
+  if (!context) {
+    throw new Error("new error");
+  }
+
+  const { products } = context;
 
   return (
     <>

@@ -32,6 +32,7 @@ const Product: React.FC<ProductProps> = ({ product }) => {
                 disabled={inCart}
                 onClick={() => {
                   value?.addToCart(id);
+                  value?.openModal(id);
                 }}
               >
                 {inCart ? (

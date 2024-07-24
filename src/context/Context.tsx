@@ -1,55 +1,20 @@
 import { createContext, useReducer, ReactNode, useEffect } from "react";
-import { storeProducts, detailProduct } from "../data";
-
-
-interface Product {
-    id: number;
-    title: string;
-    img: string;
-    price: number;
-    inCart: boolean;
-    company: string;
-    info: string;
-}
-
-interface InitialState {
-    products: Product[];
-    detailProduct: Product;
-}
-
-interface contextType extends InitialState {
-    setProducts: () => void;
-    handleDetail: (id: number) => void;
-    addToCart: (id: number) => void;
-}
-
-
-type Action =
-    | { type: "SET_PRODUCTS"; payload: Product[] }
-    | { type: "HANDLE_DETAIL", payload: Product | undefined }
-    | { type: "ADD_TO_CART", payload: number };
+import { storeProducts, detailProduct } from '../data';
+import { Reducer, contextType, InitialState, Product } from "./Reducer";
 
 
 const initialState: InitialState = {
     products: [],
     detailProduct,
+    cart: [],
+    modalOpen: false,
+    modalProduct: detailProduct,
+    cartSubTotal: 0,
+    cartTax: 0,
+    cartTotal: 0,
 };
 
 export const ProductContext = createContext<contextType | undefined>(undefined);
-
-
-const reducer = (state: InitialState, action: Action) => {
-    switch (action.type) {
-        case "SET_PRODUCTS":
-            return { ...state, products: action.payload };
-        case "HANDLE_DETAIL":
-            return {...state, detailProduct: action.payload};
-        case "ADD_TO_CART":
-            return state;
-        default:
-            return state;
-    }
-};
 
 
 const ProductProvider = ({ children }: { children: ReactNode }) => {
@@ -58,11 +23,13 @@ const ProductProvider = ({ children }: { children: ReactNode }) => {
         setProducts();
     }, []);
 
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = useReducer(Reducer, initialState);
 
     const setProducts = () => {
         const products = storeProducts.map(item => ({
-            ...item
+            ...item,
+            count: 0,
+            total: 0
         }));
         dispatch({
             type: "SET_PRODUCTS", payload: products
@@ -70,9 +37,9 @@ const ProductProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const getItem = (id: number) => {
-        const product = state.products.find(item =>
+        const product = state.products.find((item: Product) =>
             item.id === id);
-            return product;
+        return product;
     }
 
     const handleDetail = (id: number) => {
@@ -81,13 +48,62 @@ const ProductProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const addToCart = (id: number) => {
-        let tempProducts = [...state.products];
-        
-        dispatch({ type: "ADD_TO_CART", payload: id });
+        const product = state.products.find((item: Product) => item.id === id)!;
+        product.inCart = true;
+        product.count = 1;
+        product.total = product.price;
+        dispatch({ type: "ADD_TO_CART", payload: product });
     };
 
+    const openModal = (id: number) => {
+        const product = state.products.find((item: Product) =>
+            item.id === id)!;
+        dispatch({ type: "OPEN_MODAL", payload: product });
+    };
+
+    const closeModal = () => {
+        dispatch({ type: "CLOSE_MODAL" });
+    };
+
+    const increment = (id: number) => {
+        console.log("This is increment method");
+
+        dispatch({ type: "INCREMENT", payload: id});
+    };
+
+    const decrement = (id: number) => {
+        console.log("This is decrement method");
+
+        dispatch({ type: "DECREMENT", payload: id});
+    };
+
+    const removeItem = (id: number) => {
+        const product = state.cart.find((item: Product) => item.id === id)!;
+        product.inCart = false;
+        product.count = 0;
+        product.total = 0;
+
+        dispatch({ type: "REMOVE_ITEM", payload: id})
+    };
+
+    const clearCart = () => {
+        dispatch({ type: "CLEAR_CART" });
+    }
+
+
     return (
-        <ProductContext.Provider value={{ ...state, setProducts, handleDetail, addToCart }}>
+        <ProductContext.Provider value={{
+            ...state,
+            setProducts,
+            handleDetail,
+            addToCart,
+            openModal,
+            closeModal,
+            increment,
+            decrement,
+            removeItem,
+            clearCart
+        }}>
             {children}
         </ProductContext.Provider>
     );

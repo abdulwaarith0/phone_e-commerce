@@ -1,8 +1,6 @@
 import { ProductConsumer } from '../../context/Context';
 import { Link } from 'react-router-dom';
 import { ButtonContainer } from '../navbar/styled';
-// import { detailProduct } from '../../data';
-
 
 interface ProductProps {
   product: {
@@ -72,6 +70,7 @@ const Details: React.FC<ProductProps> = () => {
                     disabled={inCart ? true : false}
                     onClick={() => {
                       value?.addToCart(id);
+                      value?.openModal(id);
                     }}>
                     {inCart ? "inCart" : "add to cart"}
                   </ButtonContainer>

@@ -1,11 +1,11 @@
 import { Routes, Route } from "react-router-dom"
 import './App.css'
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Navbar, Default, Details, Cart, ProductList } from './components';
+import { Navbar, Default, Details, Cart, ProductList, Modal } from './components';
 
 
 function App() {
-
+  
   return (
     <>
       <Navbar />
@@ -23,6 +23,7 @@ function App() {
         }} />} />
         <Route path="*" element={<Default />} />
       </Routes>
+      <Modal /> 
 
     </>
   )

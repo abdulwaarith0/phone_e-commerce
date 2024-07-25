@@ -26,7 +26,7 @@ export default function cartColumns() {
                 </div>
                 <div className="col-10 mx-auto col-lg-2">
                     <p className="text-uppercase">
-                        remove
+                        remove item
                     </p>
                 </div>
                 <div className="col-10 mx-auto col-lg-2">

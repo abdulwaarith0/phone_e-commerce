@@ -4,6 +4,8 @@ import CartColumns from './cartColumns';
 import EmptyCart from './EmptyCart';
 import { ProductContext } from '../../context/Context';
 import { contextType } from '../../context/Reducer';
+import CartList from './CartList';
+
 
 const Cart: React.FC = () => {
   const { cart } = useContext(ProductContext) as contextType;
@@ -18,6 +20,7 @@ const Cart: React.FC = () => {
         <>
           <Title name="your" title="cart" />
           <CartColumns />
+          <CartList />
         </>
       ) : (
         <EmptyCart />

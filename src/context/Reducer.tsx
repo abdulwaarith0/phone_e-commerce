@@ -15,7 +15,7 @@ export interface Product {
 export interface InitialState {
     products: Product[];
     detailProduct: Product;
-    cart: [];
+    cart: Product[];
     modalOpen: boolean;
     modalProduct: Product,
     cartSubTotal: number;
@@ -56,16 +56,34 @@ export const Reducer = (state: InitialState, action: Action) => {
         case "HANDLE_DETAIL":
             return { ...state, detailProduct: action.payload };
         case "ADD_TO_CART":
-            return { ...state, products: updatedProducts(state.products, action.payload), cart: [...state.cart, action.payload]};
+            return { ...state, products: updatedProducts(state.products, action.payload), cart: [...state.cart, action.payload] };
         case "OPEN_MODAL":
             return { ...state, modalProduct: action.payload, modalOpen: true };
         case "CLOSE_MODAL":
             return { ...state, modalOpen: false };
         case "REMOVE_ITEM":
-            return { ...state, products: updatedProducts(state.products, state.cart.find((p) => p.id === action.payload)!), 
-            cart: state.cart.filter((p) => p.id !== action.payload) };
+            return {
+                ...state, products: updatedProducts(state.products, state.cart.find((p: Product) => p.id === action.payload)!),
+                cart: state.cart.filter((p: Product) => p.id !== action.payload)
+            };
         case "CLEAR_CART":
-            return { ...state, cart: []};
+            return { ...state, cart: [] };
+        case "INCREMENT":
+            return {
+                ...state,
+                cart: state.cart.map((item) =>
+                    item.id === action.payload ? { ...item, count: item.count + 1, total: item.total + item.price } : item
+                ),
+            };
+        case "DECREMENT":
+            return {
+                ...state,
+                cart: state.cart.map((item) =>
+                    item.id === action.payload && item.count > 1
+                        ? { ...item, count: item.count - 1, total: item.total - item.price }
+                        : item
+                ),
+            };
         default:
             return state;
     }

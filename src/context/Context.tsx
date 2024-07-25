@@ -66,24 +66,15 @@ const ProductProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const increment = (id: number) => {
-        console.log("This is increment method");
-
         dispatch({ type: "INCREMENT", payload: id});
     };
 
     const decrement = (id: number) => {
-        console.log("This is decrement method");
-
         dispatch({ type: "DECREMENT", payload: id});
     };
 
     const removeItem = (id: number) => {
-        const product = state.cart.find((item: Product) => item.id === id)!;
-        product.inCart = false;
-        product.count = 0;
-        product.total = 0;
-
-        dispatch({ type: "REMOVE_ITEM", payload: id})
+        dispatch({ type: "REMOVE_ITEM", payload: id});
     };
 
     const clearCart = () => {

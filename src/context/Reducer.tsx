@@ -68,8 +68,8 @@ export const Reducer = (state: InitialState, action: Action) => {
                     updatedProducts(state.products, action.payload),
                 cart: [...state.cart, action.payload],
                 cartSubTotal: state.cartSubTotal + action.payload.price,
-                cartTax: ((state.cartSubTotal + action.payload.price) * 0.1).toFixed(2),
-                cartTotal: (state.cartSubTotal + state.cartTax + action.payload.price).toFixed(2),
+                cartTax: Number(((state.cartSubTotal + action.payload.price) * 0.1).toFixed(2)),
+                cartTotal: Number(((state.cartSubTotal + state.cartTax + action.payload.price).toFixed(2))),
             };
 
         case "OPEN_MODAL":
@@ -80,14 +80,24 @@ export const Reducer = (state: InitialState, action: Action) => {
 
         case "REMOVE_ITEM":
             removedProduct = state.cart.find((p: Product) => p.id === action.payload)!;
-            return {
-                ...state,
-                products: updatedProducts(state.products, removedProduct),
-                cart: state.cart.filter((p: Product) => p.id !== action.payload),
-                cartSubTotal: state.cartSubTotal - removedProduct.total,
-                cartTax: (state.cartSubTotal - removedProduct.total) * 0.1,
-                cartTotal: state.cartSubTotal - removedProduct.total + (state.cartSubTotal - removedProduct.total) * 0.1,
-            };
+            if (removedProduct) {
+                // eslint-disable-next-line no-case-declarations
+                const updateProduct = state.products.map((product) =>
+                    product.id === removedProduct!.id
+                        ? { ...product, inCart: false }
+                        : product
+                );
+
+                return {
+                    ...state,
+                    products: updateProduct,
+                    cart: state.cart.filter((p: Product) => p.id !== action.payload),
+                    cartSubTotal: state.cartSubTotal - removedProduct.total,
+                    cartTax: (state.cartSubTotal - removedProduct.total) * 0.1,
+                    cartTotal: state.cartSubTotal - removedProduct.total + (state.cartSubTotal - removedProduct.total) * 0.1,
+                };
+            }
+            return state;
 
         case "CLEAR_CART":
             // eslint-disable-next-line no-case-declarations
@@ -114,17 +124,15 @@ export const Reducer = (state: InitialState, action: Action) => {
         case "INCREMENT":
             incrementedItem = state.cart.find((p: Product) => p.id === action.payload);
             if (incrementedItem) {
+                const updatedCartItem = { ...incrementedItem, count: incrementedItem.count + 1, total: incrementedItem.total + incrementedItem.price };
                 return {
                     ...state,
                     cart: state.cart.map((item) =>
-                        item.id === action.payload
-                            ? { ...item, count: item.count + 1, total: item.total + item.price }
-                            : item
+                        item.id === action.payload ? updatedCartItem : item
                     ),
                     cartSubTotal: state.cartSubTotal + incrementedItem.price,
-                    cartTax: ((state.cartSubTotal + incrementedItem.price) * 0.1).toFixed(2),
-                    
-                    cartTotal: (state.cartSubTotal + state.cartTax + incrementedItem.price).toFixed(2),
+                    cartTax: Number(((state.cartSubTotal + incrementedItem.price) * 0.1).toFixed(2)),
+                    cartTotal: Number(((state.cartSubTotal + state.cartTax + incrementedItem.price).toFixed(2))),
                 };
             }
             return state;
@@ -132,16 +140,15 @@ export const Reducer = (state: InitialState, action: Action) => {
         case "DECREMENT":
             decrementedItem = state.cart.find((p: Product) => p.id === action.payload);
             if (decrementedItem && decrementedItem.count > 1) {
+                const updatedCartItem = { ...decrementedItem, count: decrementedItem.count - 1, total: decrementedItem.total - decrementedItem.price };
                 return {
                     ...state,
                     cart: state.cart.map((item) =>
-                        item.id === action.payload
-                            ? { ...item, count: item.count - 1, total: item.total - item.price }
-                            : item
+                        item.id === action.payload ? updatedCartItem : item
                     ),
                     cartSubTotal: state.cartSubTotal - decrementedItem.price,
-                    cartTax: ((state.cartSubTotal - decrementedItem.price) * 0.1).toFixed(2),
-                    cartTotal: (state.cartSubTotal - decrementedItem.price - (state.cartSubTotal - decrementedItem.price) * 0.1).toFixed(2),
+                    cartTax: Number(((state.cartSubTotal - decrementedItem.price) * 0.1).toFixed(2)),
+                    cartTotal: Number(((state.cartSubTotal - decrementedItem.price - (state.cartSubTotal - decrementedItem.price) * 0.1).toFixed(2))),
                 };
             }
             return state;

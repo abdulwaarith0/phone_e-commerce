@@ -6,28 +6,27 @@ import { ProductContext } from '../../context/Context';
 import { contextType } from '../../context/Reducer';
 import CartList from './CartList';
 import CartTotal from './CartTotal';
-import { StripeElementsOptions } from '@stripe/stripe-js';
-import CheckoutForm, { stripePromise } from './StripeButton';
-import { Elements } from '@stripe/react-stripe-js';
+// import { StripeElementsOptions } from '@stripe/stripe-js';
+// import CheckoutForm, { stripePromise } from './StripeButton';
+// import { Elements } from '@stripe/react-stripe-js';
 
 
 
 const Cart: React.FC = () => {
   const { cart } = useContext(ProductContext) as contextType;
 
-  const options: StripeElementsOptions = {
-    // Fully customizable with appearance API.
-    appearance: {
-      /*...*/
-    },
-  };
+  // const options: StripeElementsOptions = {
+
+  //   appearance: {
+  //   },
+  // };
 
   if (!cart) {
     return null;
   }
 
   return (
-    <Elements stripe={stripePromise} options={options}>
+    // <Elements stripe={stripePromise} options={options}>
       <section>
         {cart.length > 0 ? (
           <>
@@ -35,13 +34,13 @@ const Cart: React.FC = () => {
             <CartColumns />
             <CartList />
             <CartTotal />
-            <CheckoutForm />
+            {/* <CheckoutForm /> */}
           </>
         ) : (
           <EmptyCart />
         )}
       </section>
-    </Elements>
+    // </Elements>
   );
 };
 

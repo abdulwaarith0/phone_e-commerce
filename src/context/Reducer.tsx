@@ -15,7 +15,7 @@ export interface Product {
 
 export interface InitialState {
     products: Product[];
-    detailProduct: Product;
+    detailProduct: Product | undefined;
     cart: Product[];
     modalOpen: boolean;
     modalProduct: Product,
@@ -39,7 +39,7 @@ export interface contextType extends InitialState {
 
 export type Action =
     | { type: "SET_PRODUCTS"; payload: Product[] }
-    | { type: "HANDLE_DETAIL", payload: Product | undefined }
+    | { type: "HANDLE_DETAIL", payload: Product | undefined}
     | { type: "ADD_TO_CART", payload: Product }
     | { type: "OPEN_MODAL", payload: Product }
     | { type: "CLOSE_MODAL" }
@@ -50,7 +50,7 @@ export type Action =
 
 
 
-export const Reducer = (state: InitialState, action: Action) => {
+export const Reducer = (state: InitialState, action: Action): InitialState => {
     let incrementedItem: Product | undefined;
     let decrementedItem: Product | undefined;
     let removedProduct: Product | undefined;
@@ -117,7 +117,7 @@ export const Reducer = (state: InitialState, action: Action) => {
                 cart: [],
                 cartSubTotal: 0,
                 cartTax: 0,
-                CartTotaL: 0,
+                cartTotal: 0,
                 products: updatedProduct,
             };
 

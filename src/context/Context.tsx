@@ -1,6 +1,6 @@
 import { createContext, useReducer, ReactNode, useEffect } from "react";
 import { storeProducts, detailProduct } from '../data';
-import { Reducer, contextType, InitialState, Product } from "./Reducer";
+import { Reducer, contextType, InitialState, Product, Action } from "./Reducer";
 
 
 const initialState: InitialState = {
@@ -23,7 +23,9 @@ const ProductProvider = ({ children }: { children: ReactNode }) => {
         setProducts();
     }, []);
 
-    const [state, dispatch] = useReducer(Reducer, initialState);
+    const [state, dispatch] = useReducer<
+        (state: InitialState, action: Action) => InitialState
+    >(Reducer, initialState);
 
     const setProducts = () => {
         const products = storeProducts.map(item => ({

@@ -1,6 +1,7 @@
-import { createContext, useReducer, ReactNode, useEffect } from "react";
+import { createContext, useReducer, ReactNode, useEffect, useState } from "react";
 import { storeProducts, detailProduct } from '../data';
 import { Reducer, contextType, InitialState, Product, Action } from "./Reducer";
+import cart from "../components/cart";
 
 
 const initialState: InitialState = {
@@ -18,6 +19,27 @@ export const ProductContext = createContext<contextType | undefined>(undefined);
 
 
 const ProductProvider = ({ children }: { children: ReactNode }) => {
+    const [ clientSecret, setClientSecret ] = useState("")
+
+    useEffect(() => {
+        const fetchClientSecret = async () => {
+            try {
+                const response = await fetch('/create-payment-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ products: cart }),
+                });
+                const { clientSecret } = await response.json();
+                setClientSecret(clientSecret);
+
+            } catch (error) {
+                console.error('Error fetching client secret:', error);
+            }
+        };
+        fetchClientSecret();
+    }, [cart]);
 
     useEffect(() => {
         setProducts();
@@ -95,7 +117,8 @@ const ProductProvider = ({ children }: { children: ReactNode }) => {
             increment,
             decrement,
             removeItem,
-            clearCart
+            clearCart,
+            clientSecret,
         }}>
             {children}
         </ProductContext.Provider>

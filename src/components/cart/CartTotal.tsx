@@ -1,12 +1,13 @@
 import React, { useContext } from 'react';
 import { ProductContext } from '../../context/Context';
 import { contextType } from '../../context/Reducer';
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom"
 
 
 const CartTotal: React.FC = () => {
   const { cartTotal, cartSubTotal, cartTax, clearCart } = useContext(ProductContext) as contextType;
   console.log(cartTotal);
+
 
   return (
     <>

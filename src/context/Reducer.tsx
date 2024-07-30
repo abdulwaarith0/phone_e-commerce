@@ -34,6 +34,7 @@ export interface contextType extends InitialState {
     clearCart: () => void;
     increment: (id: number) => void;
     decrement: (id: number) => void;
+    clientSecret: string;
 }
 
 

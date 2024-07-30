@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import {
     CardElement,
+    Elements,
     useStripe,
     useElements,
 } from '@stripe/react-stripe-js';
@@ -9,51 +10,34 @@ import { ProductContext } from '../../context/Context';
 import { contextType } from '../../context/Reducer';
 import { useNavigate } from 'react-router-dom';
 
-
 export const stripePromise = loadStripe('pk_test_51PgltaKwA1hJgAYJVN6qa5sOAWJ7oBaweR98WdE5uiF7tK9LLgPOCVBqXtp6l4QXN0utaORu1BvaN5pofC0tdyCW00gJbOupMz');
 
-const CheckoutForm: React.FC<{ stripePromise: Promise<Stripe | null> }> = ({
-    stripePromise,
-}) => {
+const CheckoutFormInner: React.FC = () => {
     const { cart, clearCart } = useContext(ProductContext) as contextType;
     const [clientSecret, setClientSecret] = useState('');
-    const [processing, setProcessing] = useState(false);
+    const [_processing, setProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const stripe = useStripe();
     const elements = useElements();
     const history = useNavigate();
 
     useEffect(() => {
-        async function loadStripeJs() {
+        const fetchClientSecret = async () => {
             try {
-                await stripePromise;
-            } catch (error) {
-                console.error('Error loading Stripe.js:', error);
-            }
-        }
-        loadStripeJs();
-    }, [stripePromise]);
-
-    useEffect(() => {
-        // Generate a Stripe payment intent on the client-side
-        const createPaymentIntent = async () => {
-            try {
-                const response = await fetch('/.netlify/functions/create-payment-intent', {
+                const response = await fetch('/create-payment-intent', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ products: cart }),
                 });
-
                 const { clientSecret } = await response.json();
                 setClientSecret(clientSecret);
             } catch (error) {
-                console.error('Error creating payment intent:', error);
+                console.error('Error fetching client secret:', error);
             }
         };
-
-        createPaymentIntent();
+        fetchClientSecret();
     }, [cart]);
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -73,11 +57,8 @@ const CheckoutForm: React.FC<{ stripePromise: Promise<Stripe | null> }> = ({
             });
 
             if (error) {
-                if (error.message) {
-                    setError(error.message);
-                } else {
-                    setError('An error occurred while processing your payment. Please try again.');
-                }
+                console.error('Error processing payment:', error);
+                setError('An error occurred while processing your payment. Please try again.');
                 setProcessing(false);
             } else {
                 clearCart();
@@ -90,19 +71,32 @@ const CheckoutForm: React.FC<{ stripePromise: Promise<Stripe | null> }> = ({
         }
     };
 
+    // return (
+    //     <form onSubmit={handleSubmit}>
+    //         <CardElement />
+    //         <button type="submit" disabled={processing || !stripe || !elements || !clientSecret}>
+    //             {processing ? 'Processing...' : 'Pay'}
+    //         </button>
+    //         {error && <div>{error}</div>}
+    //     </form>
+    // );
+
     return (
-        <form onSubmit={handleSubmit} className="d-flex justify-content-center">
+        <form onSubmit={handleSubmit}>
             <CardElement />
-            <button
-                className="btn btn-black btn-outline-danger text-uppercase mb-3 px-5 btn-hover align-self-center justify-content-center"
-                type="submit"
-                disabled={processing || !stripe || !elements || !clientSecret}
-                style={{ cursor: 'pointer' }}
-            >
-                {processing ? 'Processing...' : 'Pay'}
+            <button type="submit" disabled={!stripe}>
+                Pay ${cart.reduce((total, item) => total + item.price, 0)}
             </button>
             {error && <div>{error}</div>}
         </form>
+    );
+};
+
+const CheckoutForm: React.FC = () => {
+    return (
+        <Elements stripe={stripePromise}>
+            <CheckoutFormInner />
+        </Elements>
     );
 };
 

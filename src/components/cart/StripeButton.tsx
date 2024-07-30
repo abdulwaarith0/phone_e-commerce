@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
 import {
     CardElement,
     useStripe,
@@ -12,7 +12,9 @@ import { useNavigate } from 'react-router-dom';
 
 export const stripePromise = loadStripe('pk_test_51PgltaKwA1hJgAYJVN6qa5sOAWJ7oBaweR98WdE5uiF7tK9LLgPOCVBqXtp6l4QXN0utaORu1BvaN5pofC0tdyCW00gJbOupMz');
 
-const CheckoutForm: React.FC = () => {
+const CheckoutForm: React.FC<{ stripePromise: Promise<Stripe | null> }> = ({
+    stripePromise,
+}) => {
     const { cart, clearCart } = useContext(ProductContext) as contextType;
     const [clientSecret, setClientSecret] = useState('');
     const [processing, setProcessing] = useState(false);
@@ -20,6 +22,17 @@ const CheckoutForm: React.FC = () => {
     const stripe = useStripe();
     const elements = useElements();
     const history = useNavigate();
+
+    useEffect(() => {
+        async function loadStripeJs() {
+            try {
+                await stripePromise;
+            } catch (error) {
+                console.error('Error loading Stripe.js:', error);
+            }
+        }
+        loadStripeJs();
+    }, [stripePromise]);
 
     useEffect(() => {
         // Generate a Stripe payment intent on the client-side
@@ -78,12 +91,14 @@ const CheckoutForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            {/* <CardElement /> */}
+        <form onSubmit={handleSubmit} className="d-flex justify-content-center">
+            <CardElement />
             <button
-                className="btn btn-outline-danger text-uppercase mb-3 px-5"
+                className="btn btn-black btn-outline-danger text-uppercase mb-3 px-5 btn-hover align-self-center justify-content-center"
                 type="submit"
-                disabled={processing || !stripe || !elements || !clientSecret}>
+                disabled={processing || !stripe || !elements || !clientSecret}
+                style={{ cursor: 'pointer' }}
+            >
                 {processing ? 'Processing...' : 'Pay'}
             </button>
             {error && <div>{error}</div>}
